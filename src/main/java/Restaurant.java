@@ -84,6 +84,7 @@ public class Restaurant {
                 throw new itemNotFoundException("Item Not Found: "+itemName);
             }
         }
+
         return total;
     }
 }
