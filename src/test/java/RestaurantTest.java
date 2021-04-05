@@ -1,4 +1,5 @@
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -12,9 +13,18 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class RestaurantTest {
 
-    Restaurant restaurant = new Restaurant("Dalma","Salt Lake",LocalTime.parse("12:00"),LocalTime.parse("22:30"));
+    Restaurant restaurant;
+    Restaurant spyRestaurant;
 
-    Restaurant spyRestaurant = spy(restaurant);
+    @BeforeEach
+    public void setup () {
+        restaurant = new Restaurant("Dalma","Salt Lake",LocalTime.parse("12:00"),LocalTime.parse("22:30"));
+        restaurant.addToMenu("Paneer Dopiyaza",129);
+        restaurant.addToMenu("Kashmiri Pulao",129);
+        restaurant.addToMenu("Mushroom Masala",129);
+
+        spyRestaurant = spy(restaurant);
+    }
 
     @Test
     public void is_restaurant_open_should_return_true_if_time_is_between_opening_and_closing_time() {
@@ -74,10 +84,6 @@ class RestaurantTest {
     @Test
     public void getOrderValue_should_return_total_amount_of_the_provided_list_of_items () throws itemNotFoundException {
 
-        restaurant.addToMenu("Paneer Dopiyaza",129);
-        restaurant.addToMenu("Kashmiri Pulao",129);
-        restaurant.addToMenu("Mushroom Masala",129);
-
         ArrayList<String> selectedItems = new ArrayList<>();
         selectedItems.add("Paneer Dopiyaza");//129
         selectedItems.add("Kashmiri Pulao"); //129
@@ -86,6 +92,19 @@ class RestaurantTest {
         int totalVal = restaurant.getTotalItemValue(selectedItems);
 
         assertEquals(387, totalVal);
+    }
+
+    @Test
+    public void getOrderValue_should_throw_itemNotFoundException_for_provided_items_not_present_in_menu () throws itemNotFoundException {
+
+        ArrayList<String> selectedItems = new ArrayList<>();
+        selectedItems.add("Paneer Dopiyaza");
+        selectedItems.add("Chilly Chicken");
+        selectedItems.add("Mushroom Masala");
+
+        assertThrows(itemNotFoundException.class,()->{
+            restaurant.getTotalItemValue(selectedItems);
+        });
     }
     //<<<<<<<<<<<<<<<<<<<<CHECK ORDER VALUE>>>>>>>>>>>>>>>>>>>>>>>>>>
 }
